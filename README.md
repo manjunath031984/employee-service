@@ -1,8 +1,41 @@
-# Employee Service - Spring Boot REST API
+# Employee Service - Spring Boot REST API on Google Cloud Platform
 
-A simple RESTful API built with **Spring Boot**, **Java 17**, **Spring Data JPA**, and **PostgreSQL**.
+A simple Spring Boot REST API deployed on **Google Cloud Compute Engine** and connected to **Google Cloud SQL (PostgreSQL)**.
 
-This project demonstrates how to build a CRUD (Create, Read, Update, Delete) REST API using Spring Boot and PostgreSQL.
+---
+
+# Architecture
+
+```
+                    Internet
+                        │
+                        │
+                +----------------+
+                | Browser/Postman|
+                +--------+-------+
+                         |
+                         |
+                http://VM-IP:8080
+                         |
+                         |
+        +--------------------------------+
+        | Compute Engine VM              |
+        | Ubuntu 26.04                   |
+        | Java 17                        |
+        | Maven                          |
+        | Spring Boot REST API           |
+        +---------------+----------------+
+                        |
+                        |
+                JDBC (SSL)
+                        |
+                        |
+        +--------------------------------+
+        | Cloud SQL PostgreSQL           |
+        | PostgreSQL 18                  |
+        | Public IP                      |
+        +--------------------------------+
+```
 
 ---
 
@@ -11,99 +44,79 @@ This project demonstrates how to build a CRUD (Create, Read, Update, Delete) RES
 | Technology | Version |
 |------------|---------|
 | Java | 17 |
-| Spring Boot | 3.5.x (Recommended) |
+| Spring Boot | 3.x |
 | Maven | Latest |
-| PostgreSQL | 17 or later |
-| Spring Data JPA | Latest |
-| Hibernate | Latest |
-| IntelliJ IDEA | Community/Ultimate |
-| Postman | Latest |
+| PostgreSQL | 18 |
+| Google Cloud Compute Engine | Ubuntu 26.04 |
+| Google Cloud SQL | PostgreSQL |
+| Git | Latest |
 
 ---
 
-# Features
+# GCP Resources
 
-- Create Employee
-- Get All Employees
-- Get Employee By ID
-- Update Employee
-- Delete Employee
-- PostgreSQL Database
-- Spring Data JPA
-- REST APIs
-- Maven Build
-- Layered Architecture
-
----
-
-# Project Structure
+## Project
 
 ```
-employee-service
-│
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── company/
-│   │   │           └── employee_service/
-│   │   │
-│   │   │               ├── controller/
-│   │   │               │     └── EmployeeController.java
-│   │   │               │
-│   │   │               ├── entity/
-│   │   │               │     └── Employee.java
-│   │   │               │
-│   │   │               ├── exception/
-│   │   │               │     └── ResourceNotFoundException.java
-│   │   │               │
-│   │   │               ├── repository/
-│   │   │               │     └── EmployeeRepository.java
-│   │   │               │
-│   │   │               ├── service/
-│   │   │               │     └── EmployeeService.java
-│   │   │               │
-│   │   │               └── EmployeeServiceApplication.java
-│   │   │
-│   │   └── resources/
-│   │         └── application.properties
-│   │
-│   └── test/
-│       └── java/
-│
-├── target/
-│
-├── .gitattributes
-├── .gitignore
-├── HELP.md
-├── mvnw
-├── mvnw.cmd
-├── pom.xml
-└── README.md
+Project ID:
+gcp-dev-july-2026
+```
+
+---
+
+## Compute Engine VM
+
+```
+VM Name:
+employee-service-vm
+
+Region:
+us-central1
+
+Zone:
+us-central1-a
+
+Operating System:
+Ubuntu 26.04 LTS
+
+Machine Type:
+e2-micro
+```
+
+---
+
+## Cloud SQL
+
+```
+Database Engine:
+PostgreSQL
+
+Version:
+18
+
+Instance Name:
+employee-postgres-db
 ```
 
 ---
 
 # Prerequisites
 
-Install the following software before starting.
+Install
 
 - Java 17
 - Maven
-- IntelliJ IDEA
-- PostgreSQL
 - Git
-- Postman
 
-Verify installation.
+---
 
-## Java
+# Verify Java
 
 ```bash
 java -version
 ```
 
-Expected Output
+Expected
 
 ```
 openjdk version "17"
@@ -111,7 +124,7 @@ openjdk version "17"
 
 ---
 
-## Maven
+# Verify Maven
 
 ```bash
 mvn -version
@@ -119,213 +132,16 @@ mvn -version
 
 ---
 
-## PostgreSQL
+# Clone Repository
 
 ```bash
-psql --version
+git clone https://github.com/<github-username>/employee-service.git
 ```
 
----
-
-# Clone Project
+Go to project
 
 ```bash
-git clone https://github.com/manjunath031984/enterprise-employee-service.git
-```
-
-Open the project.
-
-```bash
-cd enterprise-employee-service
-```
-
----
-
-# PostgreSQL Installation
-
-Install PostgreSQL.
-
-During installation remember
-
-```
-Username : postgres
-Password : your_password
-Port : 5432
-```
-
----
-
-# Create Database
-
-Login into PostgreSQL.
-
-```sql
-CREATE DATABASE employee_db;
-```
-
-Verify
-
-```sql
-\l
-```
-
-Connect
-
-```sql
-\c employee_db
-```
-
----
-
-# Configure Spring Boot
-
-Open
-
-```
-src/main/resources/application.properties
-```
-
-Add
-
-```properties
-spring.application.name=employee-service
-
-server.port=8080
-
-spring.datasource.url=jdbc:postgresql://localhost:5432/employee_db
-spring.datasource.username=postgres
-spring.datasource.password=your_password
-
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-
-spring.jpa.properties.hibernate.format_sql=true
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
-```
-
----
-
-# Build Project
-
-Using Maven
-
-```bash
-mvn clean install
-```
-
----
-
-# Run Application
-
-```bash
-mvn spring-boot:run
-```
-
-OR
-
-Run
-
-```
-EmployeeServiceApplication.java
-```
-
-from IntelliJ.
-
----
-
-# Verify Application
-
-Open browser
-
-```
-http://localhost:8080
-```
-
-If no root endpoint is configured, this may return a 404 response, which is expected.
-
----
-
-# REST APIs
-
-## Create Employee
-
-POST
-
-```
-http://localhost:8080/api/employees
-```
-
-Request Body
-
-```json
-{
-    "name":"John",
-    "department":"Cloud",
-    "salary":90000
-}
-```
-
----
-
-## Get All Employees
-
-GET
-
-```
-http://localhost:8080/api/employees
-```
-
----
-
-## Get Employee By Id
-
-GET
-
-```
-http://localhost:8080/api/employees/1
-```
-
----
-
-## Update Employee
-
-PUT
-
-```
-http://localhost:8080/api/employees/1
-```
-
-Body
-
-```json
-{
-    "name":"John Smith",
-    "department":"DevOps",
-    "salary":120000
-}
-```
-
----
-
-## Delete Employee
-
-DELETE
-
-```
-http://localhost:8080/api/employees/1
-```
-
----
-
-# Expected Response
-
-```json
-{
-    "id":1,
-    "name":"John",
-    "department":"Cloud",
-    "salary":90000
-}
+cd employee-service
 ```
 
 ---
@@ -336,176 +152,408 @@ http://localhost:8080/api/employees/1
 mvn clean package
 ```
 
-Jar location
+Verify
+
+```bash
+ls target
+```
+
+Expected
 
 ```
-target/
+employee-service-0.0.1-SNAPSHOT.jar
 ```
 
-Run jar
+---
+
+# Cloud SQL
+
+Connect from VM
+
+```bash
+psql -h CLOUD_SQL_PUBLIC_IP \
+     -U postgres \
+     -d postgres
+```
+
+Example
+
+```bash
+psql -h 34.59.108.155 \
+     -U postgres \
+     -d postgres
+```
+
+---
+
+# Create Database
+
+```sql
+CREATE DATABASE employee_db;
+```
+
+Connect
+
+```sql
+\c employee_db
+```
+
+Verify
+
+```sql
+\dt
+```
+
+Expected
+
+```
+Did not find any relations.
+```
+
+---
+
+# Spring Boot Configuration
+
+Edit
+
+```
+src/main/resources/application.properties
+```
+
+Example
+
+```properties
+spring.application.name=employee-service
+
+server.port=8080
+
+spring.datasource.url=jdbc:postgresql://34.59.108.155:5432/employee_db
+spring.datasource.username=postgres
+spring.datasource.password=YOUR_PASSWORD
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+```
+
+---
+
+# Run Application
 
 ```bash
 java -jar target/employee-service-0.0.1-SNAPSHOT.jar
 ```
 
----
+Expected
 
-# Common Maven Commands
-
-Clean
-
-```bash
-mvn clean
 ```
-
-Compile
-
-```bash
-mvn compile
-```
-
-Test
-
-```bash
-mvn test
-```
-
-Package
-
-```bash
-mvn package
-```
-
-Install
-
-```bash
-mvn install
+Started EmployeeServiceApplication
+Tomcat started on port(s): 8080
 ```
 
 ---
 
-# Database Table
+# Run in Background
 
-If using
+```bash
+nohup java -jar target/employee-service-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+```
+
+Check process
+
+```bash
+ps -ef | grep java
+```
+
+View logs
+
+```bash
+tail -f app.log
+```
+
+Stop application
+
+```bash
+pkill -f employee-service
+```
+
+---
+
+# Verify Database
+
+Connect
+
+```bash
+psql -h 34.59.108.155 \
+-U postgres \
+-d employee_db
+```
+
+List tables
+
+```sql
+\dt
+```
+
+Spring Boot should automatically create tables when
 
 ```
 spring.jpa.hibernate.ddl-auto=update
 ```
 
-Hibernate automatically creates
+is configured.
+
+---
+
+# Firewall Rules
+
+Allow
+
+| Port | Purpose |
+|------|----------|
+| 22 | SSH |
+| 8080 | Spring Boot REST API |
+
+Example
 
 ```
-employees
-```
+Name:
+allow-http-8080
 
-table.
+Direction:
+Ingress
 
-Verify
-
-```sql
-SELECT * FROM employees;
+Protocols:
+tcp:8080
 ```
 
 ---
 
-# Common Errors
+# Test REST API
 
-## PostgreSQL Connection Refused
-
-Check
-
-- PostgreSQL service is running
-- Port is 5432
-
----
-
-## Authentication Failed
-
-Verify
+Health Check
 
 ```
-spring.datasource.username
+http://VM_EXTERNAL_IP:8080
+```
 
-spring.datasource.password
+Example
+
+```
+http://34.xxx.xxx.xxx:8080
 ```
 
 ---
 
-## Port Already In Use
+## Create Employee
 
-Change
+POST
 
-```properties
-server.port=8081
+```
+http://VM_EXTERNAL_IP:8080/api/employees
+```
+
+Body
+
+```json
+{
+  "name":"John",
+  "department":"Cloud",
+  "salary":90000
+}
 ```
 
 ---
 
-## Maven Dependency Error
+## Get Employees
 
-Refresh Maven
+GET
 
 ```
-Reload Maven Project
+http://VM_EXTERNAL_IP:8080/api/employees
 ```
 
 ---
 
-## Java Version Error
+## Get Employee
 
-Verify
+GET
+
+```
+http://VM_EXTERNAL_IP:8080/api/employees/1
+```
+
+---
+
+## Update Employee
+
+PUT
+
+```
+http://VM_EXTERNAL_IP:8080/api/employees/1
+```
+
+---
+
+## Delete Employee
+
+DELETE
+
+```
+http://VM_EXTERNAL_IP:8080/api/employees/1
+```
+
+---
+
+# Useful Commands
+
+Current Directory
+
+```bash
+pwd
+```
+
+List Files
+
+```bash
+ls -la
+```
+
+Build
+
+```bash
+mvn clean package
+```
+
+Run
+
+```bash
+java -jar target/employee-service-0.0.1-SNAPSHOT.jar
+```
+
+Run Background
+
+```bash
+nohup java -jar target/employee-service-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+```
+
+View Logs
+
+```bash
+tail -f app.log
+```
+
+Check Java
 
 ```bash
 java -version
 ```
 
-Must be Java 17.
+Check Maven
+
+```bash
+mvn -version
+```
+
+Check PostgreSQL
+
+```bash
+psql --version
+```
+
+Connect Database
+
+```bash
+psql -h 34.59.108.155 \
+-U postgres \
+-d employee_db
+```
+
+---
+
+# Troubleshooting
+
+## Database does not exist
+
+```
+FATAL:
+database "employee_db" does not exist
+```
+
+Solution
+
+```sql
+CREATE DATABASE employee_db;
+```
+
+---
+
+## Connection Timeout
+
+Check
+
+- Public IP enabled
+- Authorized Network configured
+- VM connectivity
+- Cloud SQL instance is RUNNING
+
+---
+
+## Maven Error
+
+```
+No POM found
+```
+
+Go to project directory
+
+```bash
+cd employee-service
+```
+
+Verify
+
+```bash
+ls
+```
+
+Should contain
+
+```
+pom.xml
+```
+
+---
+
+## Java Not Installed
+
+```bash
+sudo apt update
+
+sudo apt install openjdk-17-jdk -y
+```
 
 ---
 
 # Future Improvements
 
-- DTO Layer
-- Global Exception Handling
-- Validation
-- Swagger/OpenAPI
-- Logging
 - Docker
 - Docker Compose
-- Unit Testing
-- Integration Testing
-- Spring Security
-- JWT Authentication
-- Pagination
-- Sorting
-- Search API
-- Flyway Database Migration
-- Microservices
-- API Gateway
-- Eureka Server
-- Config Server
-- OpenFeign
-
----
-
-# Learning Objectives
-
-After completing this project you will understand
-
-- Spring Boot Basics
-- REST API Development
-- Controller Layer
-- Service Layer
-- Repository Layer
-- Entity Mapping
-- PostgreSQL Integration
-- Spring Data JPA
-- Hibernate
-- Maven Build Lifecycle
-- CRUD Operations
+- Nginx Reverse Proxy
+- HTTPS
+- Cloud SQL Private IP
+- Cloud SQL Auth Proxy
+- CI/CD using GitHub Actions
+- Jenkins Deployment
+- Google Cloud Load Balancer
+- Managed Instance Group
+- Monitoring with Cloud Monitoring
+- Logging with Cloud Logging
 
 ---
 
 # License
 
-This project is for educational purposes.
+This project is intended for learning and educational purposes.
